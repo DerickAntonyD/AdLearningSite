@@ -17,6 +17,11 @@ app.mount(
     StaticFiles(directory="static"),
     name="static"
 )
+app.mount(
+    "/game-assets",
+    StaticFiles(directory="game"),
+    name="game-assets"
+)
 
 
 # Tesseract OCR executable
@@ -214,4 +219,62 @@ async def text_tools(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="tools/text_tools.html"
+    )
+
+@app.get("/image-cropper", response_class=HTMLResponse)
+async def image_cropper(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="tools/image_cropper.html"
+    )
+
+
+@app.post("/crop-image")
+async def crop_image(
+    file: UploadFile = File(...),
+    left: int = Form(...),
+    top: int = Form(...),
+    right: int = Form(...),
+    bottom: int = Form(...)
+):
+    data = await file.read()
+
+    image = Image.open(io.BytesIO(data))
+
+    # Keep crop coordinates inside the image
+    left = max(0, min(left, image.width - 1))
+    top = max(0, min(top, image.height - 1))
+    right = max(left + 1, min(right, image.width))
+    bottom = max(top + 1, min(bottom, image.height))
+
+    cropped = image.crop((left, top, right, bottom))
+
+    if cropped.mode in ("RGBA", "LA", "P"):
+        cropped = cropped.convert("RGB")
+
+    output = io.BytesIO()
+
+    cropped.save(
+        output,
+        format="JPEG",
+        quality=90,
+        optimize=True
+    )
+
+    output.seek(0)
+
+    return StreamingResponse(
+        output,
+        media_type="image/jpeg",
+        headers={
+            "Content-Disposition":
+                'attachment; filename="cropped.jpg"'
+        }
+    )
+
+@app.get("/game", response_class=HTMLResponse)
+async def game(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="game.html"
     )

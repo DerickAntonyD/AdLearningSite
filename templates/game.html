@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Infinite Platformer - AdLearningSite</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <script src="/game-assets/levels.js"></script>
+    <script src="/game-assets/procedural_generator.js"></script>
+    <script src="/game-assets/level_manager.js"></script>
+
+</head>
+
+<body>
+
+<main class="container tool-page">
+
+    <h1>🎮 Infinite Platformer</h1>
+
+    <p>
+        Reach the green goal. Avoid falling.
+        Use <b>WASD</b> or the <b>Arrow Keys</b>.
+    </p>
+
+    <div id="game-wrapper">
+
+        <canvas
+            id="game"
+            width="900"
+            height="500">
+        </canvas>
+
+    </div>
+
+    <div class="game-info">
+        <span>Level: <b id="level">1</b></span>
+        <span>Deaths: <b id="deaths">0</b></span>
+    </div>
+
+    <button id="restart">🔄 Restart Level</button>
+
+    <p id="message"></p>
+
+    <a href="/">← Back to all tools</a>
+
+</main>
+
+<script>
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const levelDisplay = document.getElementById("level");
+const deathsDisplay = document.getElementById("deaths");
+const message = document.getElementById("message");
+const restartButton = document.getElementById("restart");
+
+const keys = {};
+
+let currentLevel = 1;
+let deaths = 0;
+
+const levelManager = new LevelManager();
+
+let levelCompleting = false;
+
+let player;
+let platforms;
+let goal;
+
+let cameraX = 0;
+
+const gravity = 0.6;
+const moveSpeed = 5;
+const jumpPower = -12;
+
+document.addEventListener("keydown", event => {
+
+    keys[event.key.toLowerCase()] = true;
+
+    if (
+        event.key === " " ||
+        event.key === "ArrowUp" ||
+        event.key.toLowerCase() === "w"
+    ) {
+        event.preventDefault();
+    }
+
+});
+
+document.addEventListener("keyup", event => {
+    keys[event.key.toLowerCase()] = false;
+});
+
+restartButton.addEventListener("click", restartLevel);
+
+
+function createLevel(levelNumber) {
+
+    const level =
+        levelManager.getLevel(levelNumber);
+
+    if (!level) {
+        return null;
+    }
+
+    const platforms =
+        level.platforms;
+
+    const lastPlatform =
+        platforms[platforms.length - 1];
+
+    return {
+        platforms: platforms,
+
+        goal: level.goal || {
+            x:
+                lastPlatform.x +
+                lastPlatform.width -
+                35,
+
+            y:
+                lastPlatform.y -
+                70,
+
+            width: 30,
+            height: 70
+        }
+    };
+}
+
+
+function loadLevel(levelNumber) {
+
+    currentLevel = levelNumber;
+
+    const generated =
+        createLevel(levelNumber);
+
+    if (!generated) {
+
+        message.textContent =
+            "⏳ Generating more levels...";
+
+        return;
+    }
+
+    platforms =
+        generated.platforms;
+
+    goal =
+        generated.goal;
+
+
+    player = {
+        x: 50,
+        y: 350,
+        width: 35,
+        height: 50,
+
+        velocityX: 0,
+        velocityY: 0,
+
+        grounded: false
+    };
+
+
+    cameraX = 0;
+
+    levelCompleting = false;
+
+
+    levelDisplay.textContent =
+        currentLevel;
+
+    deathsDisplay.textContent =
+        deaths;
+
+
+    message.textContent =
+        "Level " +
+        currentLevel +
+        " — GO!";
+
+
+    // Prepare the next batch early.
+    if (
+        levelManager.shouldGenerate(
+            currentLevel
+        )
+    ) {
+
+        levelManager.generateNextBatch();
+    }
+}
+
+
+function restartLevel() {
+
+    deaths++;
+
+    loadLevel(currentLevel);
+}
+
+
+function nextLevel() {
+
+    currentLevel++;
+
+    loadLevel(currentLevel);
+}
+
+
+function playerOnPlatform(platform) {
+
+    return (
+        player.x < platform.x + platform.width &&
+        player.x + player.width > platform.x &&
+        player.y + player.height <= platform.y + 10 &&
+        player.y + player.height + player.velocityY >= platform.y
+    );
+}
+
+
+function update() {
+
+    // Horizontal movement
+    if (
+        keys["arrowleft"] ||
+        keys["a"]
+    ) {
+        player.velocityX = -moveSpeed;
+    }
+
+    else if (
+        keys["arrowright"] ||
+        keys["d"]
+    ) {
+        player.velocityX = moveSpeed;
+    }
+
+    else {
+        player.velocityX *= 0.8;
+    }
+
+
+    // Jump
+    if (
+        (
+            keys["arrowup"] ||
+            keys["w"] ||
+            keys[" "]
+        ) &&
+        player.grounded
+    ) {
+
+        player.velocityY = jumpPower;
+
+        player.grounded = false;
+    }
+
+
+    // Gravity
+    player.velocityY += gravity;
+
+
+    // Move
+    player.x += player.velocityX;
+    player.y += player.velocityY;
+
+
+    // Ground collision
+    player.grounded = false;
+
+    for (const platform of platforms) {
+
+        if (playerOnPlatform(platform)) {
+
+            player.y =
+                platform.y - player.height;
+
+            player.velocityY = 0;
+
+            player.grounded = true;
+        }
+    }
+
+
+    // Fell off map
+    if (player.y > canvas.height + 200) {
+
+        restartLevel();
+
+        return;
+    }
+
+
+    // Goal collision
+    if (
+        !levelCompleting &&
+
+        player.x < goal.x + goal.width &&
+        player.x + player.width > goal.x &&
+        player.y < goal.y + goal.height &&
+        player.y + player.height > goal.y
+    ) {
+
+        levelCompleting = true;
+
+        message.textContent =
+            "🎉 Level complete! Loading next level...";
+
+        setTimeout(() => {
+
+            nextLevel();
+
+        }, 700);
+    }
+}
+
+
+function draw() {
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    // Background
+    ctx.fillStyle = "#111827";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    ctx.save();
+
+    ctx.translate(-cameraX, 0);
+
+
+    // Platforms
+    for (const platform of platforms) {
+
+        ctx.fillStyle = "#374151";
+
+        ctx.fillRect(
+            platform.x,
+            platform.y,
+            platform.width,
+            platform.height
+        );
+    }
+
+
+    // Goal
+    ctx.fillStyle = "#22c55e";
+
+    ctx.fillRect(
+        goal.x,
+        goal.y,
+        goal.width,
+        goal.height
+    );
+
+
+    // Player
+    ctx.fillStyle = "#3b82f6";
+
+    ctx.fillRect(
+        player.x,
+        player.y,
+        player.width,
+        player.height
+    );
+
+
+    ctx.restore();
+}
+
+
+function gameLoop() {
+
+    update();
+
+    draw();
+
+    requestAnimationFrame(gameLoop);
+}
+
+
+loadLevel(1);
+
+gameLoop();
+
+</script>
+
+</body>
+</html>

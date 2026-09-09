@@ -1,0 +1,85 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    text-align: center;
+}
+
+.ad-box {
+    width: min(728px, 90%);
+    min-height: 120px;
+    margin: 25px auto;
+    padding: 12px;
+
+    border: 1px dashed #555;
+    background: #181818;
+}
+
+.ad-box.large {
+    min-height: 250px;
+}
+
+.ad-box span {
+    display: block;
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.ad-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 70px;
+
+    color: #777;
+    font-size: 18px;
+}
+
+.large .ad-placeholder {
+    min-height: 200px;
+}
+
+main {
+    padding: 60px 20px;
+}
+
+h1 {
+    font-size: 42px;
+    margin-bottom: 20px;
+}
+
+.message {
+    font-size: 20px;
+    color: #ccc;
+}
+
+.small {
+    color: #888;
+}
+
+.loader {
+    width: 55px;
+    height: 55px;
+
+    margin: 35px auto;
+
+    border: 5px solid #333;
+    border-top: 5px solid white;
+
+    border-radius: 50%;
+
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

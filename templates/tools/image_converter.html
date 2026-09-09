@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Image Converter - AdLearningSite</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+    <main class="tool-page">
+
+        <a href="/" class="back">
+            ← Back to tools
+        </a>
+
+        <h1>🔄 Image Converter</h1>
+
+        <p>
+            Convert images between PNG, JPG and WebP.
+        </p>
+
+        <form
+            action="/convert-image"
+            method="post"
+            enctype="multipart/form-data"
+            class="upload-box"
+        >
+
+            <label for="file">
+                Choose an image
+            </label>
+
+            <input
+                id="file"
+                type="file"
+                name="file"
+                accept="image/*"
+                required
+            >
+
+            <label for="output_format">
+                Convert to
+            </label>
+
+            <select
+                id="output_format"
+                name="output_format"
+                required
+            >
+
+                <option value="PNG">
+                    PNG
+                </option>
+
+                <option value="JPEG">
+                    JPG
+                </option>
+
+                <option value="WEBP">
+                    WebP
+                </option>
+
+            </select>
+
+            <button type="submit">
+                Convert Image
+            </button>
+
+        </form>
+
+        <section class="info">
+
+            <h2>Supported formats</h2>
+
+            <ul>
+                <li>PNG</li>
+                <li>JPG / JPEG</li>
+                <li>WebP</li>
+            </ul>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

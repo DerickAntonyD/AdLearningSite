@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Text Toolbox - AdLearningSite</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+    <main class="tool-page">
+
+        <a href="/" class="back">
+            ← Back to tools
+        </a>
+
+        <h1>📝 Text Toolbox</h1>
+
+        <p>
+            Quickly count, clean and transform your text.
+        </p>
+
+
+        <div class="text-tool-box">
+
+            <textarea
+                id="textInput"
+                placeholder="Type or paste your text here..."
+            ></textarea>
+
+
+            <div class="text-stats">
+
+                <div>
+                    <strong id="wordCount">0</strong>
+                    <span>Words</span>
+                </div>
+
+                <div>
+                    <strong id="charCount">0</strong>
+                    <span>Characters</span>
+                </div>
+
+                <div>
+                    <strong id="lineCount">0</strong>
+                    <span>Lines</span>
+                </div>
+
+            </div>
+
+
+            <div class="text-buttons">
+
+                <button onclick="makeUppercase()">
+                    🔠 UPPERCASE
+                </button>
+
+                <button onclick="makeLowercase()">
+                    🔡 lowercase
+                </button>
+
+                <button onclick="removeSpaces()">
+                    🧹 Remove Extra Spaces
+                </button>
+
+                <button onclick="reverseText()">
+                    ↔️ Reverse
+                </button>
+
+                <button onclick="copyText()">
+                    📋 Copy
+                </button>
+
+                <button onclick="clearText()">
+                    🗑️ Clear
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <section class="info">
+
+            <h2>How to use</h2>
+
+            <ol>
+
+                <li>Type or paste your text.</li>
+
+                <li>See word and character counts instantly.</li>
+
+                <li>Choose a text operation.</li>
+
+                <li>Copy your result.</li>
+
+            </ol>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        const textInput =
+            document.getElementById("textInput");
+
+        const wordCount =
+            document.getElementById("wordCount");
+
+        const charCount =
+            document.getElementById("charCount");
+
+        const lineCount =
+            document.getElementById("lineCount");
+
+
+        function updateStats() {
+
+            const text = textInput.value;
+
+            const trimmed = text.trim();
+
+            const words =
+                trimmed === ""
+                    ? 0
+                    : trimmed.split(/\s+/).length;
+
+            const characters = text.length;
+
+            const lines =
+                text === ""
+                    ? 0
+                    : text.split("\n").length;
+
+
+            wordCount.textContent = words;
+
+            charCount.textContent = characters;
+
+            lineCount.textContent = lines;
+        }
+
+
+        function makeUppercase() {
+
+            textInput.value =
+                textInput.value.toUpperCase();
+
+            updateStats();
+        }
+
+
+        function makeLowercase() {
+
+            textInput.value =
+                textInput.value.toLowerCase();
+
+            updateStats();
+        }
+
+
+        function removeSpaces() {
+
+            textInput.value =
+                textInput.value
+                    .replace(/\s+/g, " ")
+                    .trim();
+
+            updateStats();
+        }
+
+
+        function reverseText() {
+
+            textInput.value =
+                [...textInput.value]
+                    .reverse()
+                    .join("");
+
+            updateStats();
+        }
+
+
+        async function copyText() {
+
+            await navigator.clipboard.writeText(
+                textInput.value
+            );
+        }
+
+
+        function clearText() {
+
+            textInput.value = "";
+
+            updateStats();
+        }
+
+
+        textInput.addEventListener(
+            "input",
+            updateStats
+        );
+
+
+        updateStats();
+
+    </script>
+
+</body>
+
+</html>

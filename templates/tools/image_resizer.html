@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Image Resizer - AdLearningSite</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+    <main class="tool-page">
+
+        <a href="/" class="back">
+            ← Back to tools
+        </a>
+
+        <h1>📐 Image Resizer</h1>
+
+        <p>
+            Resize an image to the exact width and height you need.
+        </p>
+
+        <form
+            action="/resize-image"
+            method="post"
+            enctype="multipart/form-data"
+            class="upload-box"
+        >
+
+            <label for="file">
+                Choose an image
+            </label>
+
+            <input
+                id="file"
+                type="file"
+                name="file"
+                accept="image/*"
+                required
+            >
+
+            <label for="width">
+                Width (pixels)
+            </label>
+
+            <input
+                id="width"
+                type="number"
+                name="width"
+                min="1"
+                max="5000"
+                placeholder="Example: 1920"
+                required
+            >
+
+            <label for="height">
+                Height (pixels)
+            </label>
+
+            <input
+                id="height"
+                type="number"
+                name="height"
+                min="1"
+                max="5000"
+                placeholder="Example: 1080"
+                required
+            >
+
+            <button type="submit">
+                Resize Image
+            </button>
+
+        </form>
+
+        <section class="info">
+
+            <h2>How it works</h2>
+
+            <ol>
+                <li>Choose an image.</li>
+                <li>Enter the desired width.</li>
+                <li>Enter the desired height.</li>
+                <li>Click Resize Image.</li>
+                <li>Download the resized image.</li>
+            </ol>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

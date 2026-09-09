@@ -2,84 +2,249 @@
     box-sizing: border-box;
 }
 
+
 body {
     margin: 0;
+
     font-family: Arial, sans-serif;
+
     background: #111;
     color: white;
+}
+
+
+.hero {
     text-align: center;
+
+    padding: 80px 20px 50px;
 }
 
-.ad-box {
-    width: min(728px, 90%);
-    min-height: 120px;
-    margin: 25px auto;
-    padding: 12px;
 
-    border: 1px dashed #555;
-    background: #181818;
+.hero h1 {
+    font-size: 48px;
+
+    margin-bottom: 15px;
 }
 
-.ad-box.large {
-    min-height: 250px;
+
+.hero p {
+    font-size: 20px;
+
+    color: #aaa;
 }
 
-.ad-box span {
+
+.container {
+    width: min(1000px, 90%);
+
+    margin: auto;
+}
+
+
+.container > h2 {
+    text-align: center;
+
+    margin-bottom: 30px;
+}
+
+
+.tools-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 20px;
+}
+
+
+.tool-card {
     display: block;
-    font-size: 11px;
-    color: #888;
-    margin-bottom: 10px;
+
+    padding: 25px;
+
+    min-height: 200px;
+
+    background: #1b1b1b;
+
+    border: 1px solid #333;
+
+    border-radius: 15px;
+
+    color: white;
+
+    text-decoration: none;
+
+    transition: transform 0.2s,
+                border-color 0.2s;
 }
 
-.ad-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-    min-height: 70px;
+.tool-card:hover {
+    transform: translateY(-4px);
+
+    border-color: #777;
+}
+
+
+.tool-icon {
+    font-size: 40px;
+
+    margin-bottom: 15px;
+}
+
+
+.tool-card h3 {
+    margin: 10px 0;
+}
+
+
+.tool-card p {
+    color: #aaa;
+
+    line-height: 1.5;
+}
+
+
+.tool-card span {
+    display: inline-block;
+
+    margin-top: 10px;
+
+    font-size: 13px;
+
+    color: #888;
+}
+
+
+.disabled {
+    opacity: 0.7;
+}
+
+
+.info {
+    margin: 50px 0;
+
+    padding: 30px;
+
+    background: #181818;
+
+    border-radius: 15px;
+
+    border: 1px solid #333;
+}
+
+
+.info p,
+.info li {
+    color: #bbb;
+
+    line-height: 1.7;
+}
+
+
+footer {
+    text-align: center;
+
+    padding: 30px;
 
     color: #777;
+}
+
+
+.tool-page {
+    width: min(800px, 90%);
+
+    margin: 60px auto;
+}
+
+
+.back {
+    color: #aaa;
+
+    text-decoration: none;
+}
+
+
+.back:hover {
+    color: white;
+}
+
+
+.tool-page h1 {
+    font-size: 42px;
+
+    margin-top: 40px;
+}
+
+
+.tool-page > p {
+    color: #aaa;
+
     font-size: 18px;
 }
 
-.large .ad-placeholder {
-    min-height: 200px;
+
+.upload-box {
+    margin-top: 40px;
+
+    padding: 40px;
+
+    background: #1b1b1b;
+
+    border: 1px solid #333;
+
+    border-radius: 15px;
+
+    text-align: center;
 }
 
-main {
-    padding: 60px 20px;
-}
 
-h1 {
-    font-size: 42px;
+.upload-box label {
+    display: block;
+
     margin-bottom: 20px;
-}
 
-.message {
     font-size: 20px;
-    color: #ccc;
 }
 
-.small {
-    color: #888;
+
+.upload-box input {
+    display: block;
+
+    width: 100%;
+
+    margin-bottom: 25px;
+
+    padding: 15px;
+
+    background: #111;
+
+    color: white;
+
+    border: 1px solid #444;
+
+    border-radius: 8px;
 }
 
-.loader {
-    width: 55px;
-    height: 55px;
 
-    margin: 35px auto;
+button {
+    padding: 13px 25px;
 
-    border: 5px solid #333;
-    border-top: 5px solid white;
+    border: none;
 
-    border-radius: 50%;
+    border-radius: 8px;
 
-    animation: spin 1s linear infinite;
+    background: white;
+
+    color: black;
+
+    font-size: 16px;
+
+    cursor: pointer;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+
+button:hover {
+    opacity: 0.85;
 }

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Image Compressor - AdLearningSite</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+
+<body>
+
+    <main class="tool-page">
+
+        <a href="/" class="back">
+            ← Back to tools
+        </a>
+
+
+        <h1>🖼️ Image Compressor</h1>
+
+        <p>
+            Reduce the size of an image quickly.
+        </p>
+
+
+        <form
+            action="/compress-image"
+            method="post"
+            enctype="multipart/form-data"
+            class="upload-box"
+        >
+
+            <label for="file">
+                Choose an image
+            </label>
+
+            <input
+                id="file"
+                type="file"
+                name="file"
+                accept="image/*"
+                required
+            >
+
+            <button type="submit">
+                Compress Image
+            </button>
+
+        </form>
+
+
+        <section class="info">
+
+            <h2>How it works</h2>
+
+            <ol>
+
+                <li>Choose an image.</li>
+
+                <li>Upload it.</li>
+
+                <li>
+                    Our server compresses the image.
+                </li>
+
+                <li>
+                    Download the compressed image.
+                </li>
+
+            </ol>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

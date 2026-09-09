@@ -4,11 +4,11 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
 from PIL import Image
+import pytesseract
 import io
 
 
 app = FastAPI(title="AdLearningSite")
-
 
 templates = Jinja2Templates(directory="templates")
 
@@ -16,6 +16,12 @@ app.mount(
     "/static",
     StaticFiles(directory="static"),
     name="static"
+)
+
+
+# Tesseract OCR executable
+pytesseract.pytesseract.tesseract_cmd = (
+    r"D:\visionBotAI\Tools\tesseract.exe"
 )
 
 
@@ -62,5 +68,35 @@ async def compress_image(file: UploadFile = File(...)):
         headers={
             "Content-Disposition":
                 'attachment; filename="compressed.jpg"'
+        }
+    )
+
+
+@app.get("/image-to-text", response_class=HTMLResponse)
+async def image_to_text(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="tools/image_to_text.html"
+    )
+
+
+@app.post("/extract-text", response_class=HTMLResponse)
+async def extract_text(
+    request: Request,
+    file: UploadFile = File(...)
+):
+
+    data = await file.read()
+
+    image = Image.open(io.BytesIO(data))
+
+    text = pytesseract.image_to_string(image)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="tools/image_to_text.html",
+        context={
+            "request": request,
+            "text": text
         }
     )

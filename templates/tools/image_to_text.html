@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Image to Text - AdLearningSite</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+
+<body>
+
+    <main class="tool-page">
+
+        <a href="/" class="back">
+            ← Back to tools
+        </a>
+
+
+        <h1>🔤 Image → Text</h1>
+
+        <p>
+            Upload an image and extract the text from it.
+        </p>
+
+
+        <form
+            action="/extract-text"
+            method="post"
+            enctype="multipart/form-data"
+            class="upload-box"
+        >
+
+            <label for="file">
+                Choose an image
+            </label>
+
+            <input
+                id="file"
+                type="file"
+                name="file"
+                accept="image/*"
+                required
+            >
+
+            <button type="submit">
+                Extract Text
+            </button>
+
+        </form>
+
+
+        {% if text is defined %}
+
+        <section class="info">
+
+            <h2>Extracted Text</h2>
+
+            <textarea
+                rows="15"
+                style="width:100%; padding:15px;"
+            >{{ text }}</textarea>
+
+        </section>
+
+        {% endif %}
+
+
+        <section class="info">
+
+            <h2>How it works</h2>
+
+            <ol>
+
+                <li>Choose an image.</li>
+
+                <li>Upload it.</li>
+
+                <li>OCR reads the image.</li>
+
+                <li>Copy the extracted text.</li>
+
+            </ol>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

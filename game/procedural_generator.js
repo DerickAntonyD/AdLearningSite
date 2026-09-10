@@ -9,6 +9,9 @@
 
 const PLAYER_WIDTH = 35;
 
+// Maximum horizontal gap allowed between platforms.
+const MAX_PLATFORM_GAP = 150;
+
 const PLAYER_HEIGHT = 50;
 
 const MOVE_SPEED = 5;
@@ -26,6 +29,12 @@ function canReachPlatform(
     previous,
     next
 ) {
+    const horizontalGap =
+        next.x - (previous.x + previous.width);
+
+    if (horizontalGap > MAX_PLATFORM_GAP) {
+        return false;
+    }
 
     /*
      * Try multiple launch positions.
@@ -707,8 +716,11 @@ function generateOneLevel(
 
 
             const maxGap =
-                110 +
-                difficulty * 5;
+                Math.min(
+                    MAX_PLATFORM_GAP,
+                    110 +
+                    difficulty * 5
+                );
 
 
             const gap =

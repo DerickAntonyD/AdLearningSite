@@ -1,16 +1,7 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2JYZKPE303"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-2JYZKPE303');
-    </script>
 
     <meta charset="UTF-8">
 
@@ -184,182 +175,6 @@ const restartButton =
 ========================================================= */
 
 const keys = {};
-
-/* =========================================================
-   AI LEARNING AGENT
-========================================================= */
-
-let aiSocket = null;
-
-let aiConnected = false;
-
-
-/*
- * Connect to local AI server.
- */
-
-function connectAI() {
-
-    try {
-
-        aiSocket =
-            new WebSocket(
-                "ws://127.0.0.1:8000/ws/game"
-            );
-
-
-        aiSocket.onopen = () => {
-
-            aiConnected = true;
-
-            console.log(
-                "🤖 AI CONNECTED"
-            );
-
-        };
-
-
-        aiSocket.onclose = () => {
-
-            aiConnected = false;
-
-            console.log(
-                "🔌 AI DISCONNECTED"
-            );
-
-        };
-
-
-        aiSocket.onerror = error => {
-
-            console.error(
-                "❌ AI WebSocket error",
-                error
-            );
-
-        };
-
-
-        aiSocket.onmessage = event => {
-
-            const action =
-                JSON.parse(event.data);
-
-            console.log(
-                "🤖 AI ACTION:",
-                action
-            );
-
-
-            executeAIAction(
-                action.action
-            );
-
-        };
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "❌ Could not connect to AI",
-            error
-        );
-
-    }
-
-}
-
-
-/*
- * Execute an AI action.
- */
-
-function executeAIAction(action) {
-
-    /*
-     * Clear AI movement.
-     */
-
-    keys["a"] = false;
-    keys["d"] = false;
-    keys["w"] = false;
-
-
-    /*
-     * Apply action.
-     */
-
-    if (action === "LEFT") {
-
-        keys["a"] = true;
-
-    }
-
-    else if (action === "RIGHT") {
-
-        keys["d"] = true;
-
-    }
-
-    else if (action === "JUMP") {
-
-        keys["w"] = true;
-
-    }
-
-}
-
-
-/*
- * Send game state to AI.
- */
-
-function sendAIState() {
-
-    if (
-        !aiConnected ||
-        !player
-    ) {
-
-        return;
-
-    }
-
-
-    const state = {
-
-        x: player.x,
-
-        y: player.y,
-
-        vx: player.velocityX,
-
-        vy: player.velocityY,
-
-        grounded: player.grounded,
-
-        level: currentLevel,
-
-        score: score,
-
-        deaths: deaths
-
-    };
-
-
-    aiSocket.send(
-        JSON.stringify(state)
-    );
-
-}
-
-
-/*
- * Start AI connection.
- */
-
-connectAI();
 
 
 document.addEventListener(
@@ -1722,8 +1537,6 @@ function update() {
         return;
 
     }
-
-    sendAIState();
 
 
     /* =====================================================

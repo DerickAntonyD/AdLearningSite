@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Image Cropper - AdLearningSite</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <script async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5103140968395570"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <main class="container tool-page">
+
+        <h1>✂️ Image Cropper</h1>
+
+        <p>Crop an image to your preferred dimensions.</p>
+
+        <form action="/crop-image" method="post" enctype="multipart/form-data">
+
+            <div class="upload-box">
+
+                <label for="file">
+                    Select an image
+                </label>
+
+                <input
+                    type="file"
+                    id="file"
+                    name="file"
+                    accept="image/*"
+                    required
+                >
+
+            </div>
+
+            <div class="text-tool-box">
+
+                <label>
+                    Left
+                    <input
+                        type="number"
+                        name="left"
+                        value="0"
+                        min="0"
+                    >
+                </label>
+
+                <label>
+                    Top
+                    <input
+                        type="number"
+                        name="top"
+                        value="0"
+                        min="0"
+                    >
+                </label>
+
+                <label>
+                    Right
+                    <input
+                        type="number"
+                        name="right"
+                        value="500"
+                        min="1"
+                    >
+                </label>
+
+                <label>
+                    Bottom
+                    <input
+                        type="number"
+                        name="bottom"
+                        value="500"
+                        min="1"
+                    >
+                </label>
+
+            </div>
+
+            <button type="submit">
+                ✂️ Crop Image
+            </button>
+
+        </form>
+
+        <br>
+
+        <a href="/">← Back to all tools</a>
+
+    </main>
+
+</body>
+</html>

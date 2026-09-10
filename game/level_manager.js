@@ -1,31 +1,44 @@
 class LevelManager {
 
     constructor() {
+
         this.levels = [];
+
         this.generatedUntil = 0;
+
         this.generating = false;
+
+        this.BATCH_SIZE = 10;
+
+        this.BUFFER_SIZE = 5;
 
         this.loadInitialLevels();
     }
 
+
     loadInitialLevels() {
 
-        // First 10 levels come from levels.js
         this.levels = [...LEVELS];
 
-        this.generatedUntil = this.levels.length;
+        this.generatedUntil =
+            this.levels.length;
 
         console.log(
-            `Loaded ${this.generatedUntil} levels`
+            `🎮 Loaded ${this.generatedUntil} fixed levels`
         );
     }
 
 
     getLevel(levelNumber) {
 
-        const index = levelNumber - 1;
+        const index =
+            levelNumber - 1;
 
-        if (index < 0 || index >= this.levels.length) {
+        if (
+            index < 0 ||
+            index >= this.levels.length
+        ) {
+
             return null;
         }
 
@@ -42,14 +55,17 @@ class LevelManager {
     }
 
 
+    /*
+     * Keep at least BUFFER_SIZE levels
+     * ahead of the player.
+     */
     shouldGenerate(currentLevel) {
 
-        // When the player reaches 5 levels before
-        // the end of the available levels,
-        // start preparing the next batch.
+        const remaining =
+            this.generatedUntil - currentLevel;
 
         return (
-            currentLevel >= this.generatedUntil - 5 &&
+            remaining <= this.BUFFER_SIZE &&
             !this.generating
         );
     }
@@ -58,37 +74,56 @@ class LevelManager {
     async generateNextBatch() {
 
         if (this.generating) {
+
             return;
         }
 
         this.generating = true;
 
+        const startLevel =
+            this.generatedUntil + 1;
+
         console.log(
-            "🚀 Preparing next 10 levels..."
+            `🚀 Generating levels ${startLevel}-${startLevel + this.BATCH_SIZE - 1}...`
         );
 
+
         /*
-         * For now we use our free procedural generator.
-         *
-         * Later this function can optionally call
-         * a local AI model.
+         * Small delay makes generation
+         * happen outside the immediate
+         * gameplay step.
          */
+        await new Promise(resolve => {
+
+            setTimeout(resolve, 0);
+
+        });
+
 
         const newLevels =
             generateProceduralLevels(
-                this.generatedUntil + 1,
-                10
+                startLevel,
+                this.BATCH_SIZE
             );
 
-        this.levels.push(...newLevels);
 
-        this.generatedUntil =
-            this.levels.length;
+        if (newLevels.length > 0) {
+
+            this.levels.push(
+                ...newLevels
+            );
+
+            this.generatedUntil =
+                this.levels.length;
+
+
+            console.log(
+                `✅ Levels ready: 1-${this.generatedUntil}`
+            );
+
+        }
+
 
         this.generating = false;
-
-        console.log(
-            `✅ Levels ready: 1-${this.generatedUntil}`
-        );
     }
 }

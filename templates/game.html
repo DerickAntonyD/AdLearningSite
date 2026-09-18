@@ -108,6 +108,55 @@
         </span>
 
     </div>
+    <!-- =====================================================
+     NIGHT EVENT
+====================================================== -->
+
+<section id="night-event" class="night-event">
+
+    <div class="event-header">
+
+        <span class="event-icon">🌙</span>
+
+        <div>
+
+            <h2>Night Skin Event</h2>
+
+            <p id="event-status">
+                Checking event...
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div id="event-timer">
+        ⏳ Loading...
+    </div>
+
+
+    <div id="event-reward"
+         class="event-reward"
+         hidden>
+
+        <h3>✨ Skin Unlocked!</h3>
+
+        <div
+            id="skin-preview"
+            class="skin-preview">
+        </div>
+
+        <p id="skin-name">
+            Random Event Skin
+        </p>
+
+        <p id="skin-expiry">
+        </p>
+
+    </div>
+
+</section>
 
 
     <!-- =====================================================
@@ -2073,6 +2122,21 @@ function update() {
         message.textContent =
             "🎉 LEVEL COMPLETE! +BONUS";
 
+        /*
+        * Night Event reward.
+        *
+        * The server decides whether the player
+        * can receive the temporary skin.
+        */
+
+        if (
+            typeof tryClaimNightEventSkin === "function"
+        ) {
+
+            tryClaimNightEventSkin();
+
+        }
+
 
         setTimeout(() => {
 
@@ -2912,6 +2976,960 @@ gameLoop();
 
 
 </script>
+<script>
+
+/* =========================================================
+   NIGHT EVENT SKIN SYSTEM
+========================================================= */
+
+let activeEventSkin =
+    JSON.parse(
+        localStorage.getItem(
+            "adLearningNightEventSkin"
+        ) || "null"
+    );
+
+
+let activeEventSkinExpiry =
+    localStorage.getItem(
+        "adLearningNightEventSkinExpiry"
+    );
+
+
+/* =========================================================
+   BROWSER EVENT IDENTITY
+========================================================= */
+
+let eventClaimIdentity =
+    localStorage.getItem(
+        "adLearningNightEventIdentity"
+    );
+
+
+if (!eventClaimIdentity) {
+
+    eventClaimIdentity =
+        crypto.randomUUID();
+
+    localStorage.setItem(
+        "adLearningNightEventIdentity",
+        eventClaimIdentity
+    );
+
+}
+
+
+/* =========================================================
+   EVENT STATUS
+========================================================= */
+
+async function updateNightEventStatus() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/event/status"
+            );
+
+
+        if (!response.ok) {
+
+            return;
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const status =
+            document.getElementById(
+                "event-status"
+            );
+
+        const timer =
+            document.getElementById(
+                "event-timer"
+            );
+
+
+        if (data.active) {
+
+            status.textContent =
+                "🌙 LIVE NOW — 6:30 PM to 9:30 PM IST";
+
+            timer.textContent =
+                "🎮 Play and complete a level to unlock today's random skin.";
+
+        }
+
+        else {
+
+            status.textContent =
+                "🌙 Night Event — 6:30 PM to 9:30 PM IST";
+
+            const hours =
+                Math.floor(
+                    data.seconds_until_change /
+                    3600
+                );
+
+            const minutes =
+                Math.floor(
+                    (
+                        data.seconds_until_change %
+                        3600
+                    ) / 60
+                );
+
+            const seconds =
+                data.seconds_until_change %
+                60;
+
+
+            timer.textContent =
+                "⏳ Next event in " +
+                String(hours).padStart(2, "0") +
+                ":" +
+                String(minutes).padStart(2, "0") +
+                ":" +
+                String(seconds).padStart(2, "0");
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Night Event status error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CLAIM SKIN
+========================================================= */
+
+let eventClaimInProgress = false;
+
+
+async function tryClaimNightEventSkin() {
+
+    if (
+        eventClaimInProgress
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Don't claim again if this browser
+     * already has today's temporary skin.
+     */
+
+    if (
+        activeEventSkin
+        &&
+        activeEventSkinExpiry
+    ) {
+
+        const expiry =
+            new Date(
+                activeEventSkinExpiry
+            );
+
+
+        if (
+            expiry > new Date()
+        ) {
+
+            showEventSkin();
+
+            return;
+
+        }
+
+    }
+
+
+    eventClaimInProgress = true;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/event/claim",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            claim_identity:
+                                eventClaimIdentity
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok
+        ) {
+
+            if (
+                response.status === 409
+            ) {
+
+                message.textContent =
+                    "🎁 Today's event skin was already claimed.";
+
+            }
+
+            else if (
+                response.status === 403
+            ) {
+
+                message.textContent =
+                    "🌙 The Night Event has ended.";
+
+            }
+
+            else {
+
+                message.textContent =
+                    "⚠️ Event reward unavailable.";
+
+            }
+
+
+            return;
+
+        }
+
+
+        activeEventSkin =
+            data.skin;
+
+
+        activeEventSkinExpiry =
+            data.expires_at;
+
+
+        localStorage.setItem(
+            "adLearningNightEventSkin",
+            JSON.stringify(
+                activeEventSkin
+            )
+        );
+
+
+        localStorage.setItem(
+            "adLearningNightEventSkinExpiry",
+            activeEventSkinExpiry
+        );
+
+
+        showEventSkin();
+
+
+        message.textContent =
+            "✨ RANDOM NIGHT SKIN UNLOCKED!";
+
+
+        console.log(
+            "🎁 Event skin unlocked:",
+            data.reward_id
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Event skin claim error:",
+            error
+        );
+
+    }
+
+    finally {
+
+        eventClaimInProgress =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   CHECK EXPIRATION
+========================================================= */
+
+function checkEventSkinExpiration() {
+
+    if (
+        !activeEventSkin
+        ||
+        !activeEventSkinExpiry
+    ) {
+
+        return;
+
+    }
+
+
+    const expiry =
+        new Date(
+            activeEventSkinExpiry
+        );
+
+
+    if (
+        expiry <= new Date()
+    ) {
+
+        activeEventSkin =
+            null;
+
+        activeEventSkinExpiry =
+            null;
+
+
+        localStorage.removeItem(
+            "adLearningNightEventSkin"
+        );
+
+        localStorage.removeItem(
+            "adLearningNightEventSkinExpiry"
+        );
+
+
+        hideEventSkin();
+
+
+        console.log(
+            "🧹 Temporary event skin expired."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SHOW SKIN
+========================================================= */
+
+function showEventSkin() {
+
+    const reward =
+        document.getElementById(
+            "event-reward"
+        );
+
+    const preview =
+        document.getElementById(
+            "skin-preview"
+        );
+
+    const expiryText =
+        document.getElementById(
+            "skin-expiry"
+        );
+
+
+    if (!reward) {
+
+        return;
+
+    }
+
+
+    reward.hidden = false;
+
+
+    preview.innerHTML = "";
+
+
+    const skinBlock =
+        document.createElement(
+            "div"
+        );
+
+
+    skinBlock.className =
+        "event-skin-preview";
+
+
+    skinBlock.style.background =
+        activeEventSkin.primary;
+
+
+    skinBlock.dataset.pattern =
+        activeEventSkin.pattern;
+
+
+    skinBlock.dataset.accessory =
+        activeEventSkin.accessory;
+
+
+    preview.appendChild(
+        skinBlock
+    );
+
+
+    if (
+        activeEventSkinExpiry
+    ) {
+
+        const expiry =
+            new Date(
+                activeEventSkinExpiry
+            );
+
+
+        expiryText.textContent =
+            "⏳ Temporary skin expires: " +
+            expiry.toLocaleString();
+
+    }
+
+}
+
+
+/* =========================================================
+   HIDE SKIN
+========================================================= */
+
+function hideEventSkin() {
+
+    const reward =
+        document.getElementById(
+            "event-reward"
+        );
+
+
+    if (reward) {
+
+        reward.hidden = true;
+
+    }
+
+}
+
+
+/* =========================================================
+   DRAW RANDOM EVENT SKIN
+========================================================= */
+
+function drawEventSkinPlayer() {
+
+    const skin =
+        activeEventSkin;
+
+
+    /*
+     * Optional glow.
+     */
+
+    if (
+        skin.glow !== "none"
+    ) {
+
+        ctx.shadowColor =
+            skin.secondary;
+
+        ctx.shadowBlur =
+            skin.glow === "bright"
+                ? 18
+                : 9;
+
+    }
+
+
+    /*
+     * Main block.
+     */
+
+    ctx.fillStyle =
+        skin.primary;
+
+
+    ctx.fillRect(
+
+        player.x,
+
+        player.y,
+
+        player.width,
+
+        player.height
+
+    );
+
+
+    ctx.shadowBlur = 0;
+
+
+    /*
+     * Pattern.
+     */
+
+    ctx.fillStyle =
+        skin.secondary;
+
+
+    if (
+        skin.pattern === "stripe"
+    ) {
+
+        for (
+            let y = player.y;
+            y < player.y + player.height;
+            y += 12
+        ) {
+
+            ctx.fillRect(
+                player.x,
+                y,
+                player.width,
+                5
+            );
+
+        }
+
+    }
+
+    else if (
+        skin.pattern === "checker"
+    ) {
+
+        const size = 9;
+
+        for (
+            let row = 0;
+            row < 6;
+            row++
+        ) {
+
+            for (
+                let col = 0;
+                col < 4;
+                col++
+            ) {
+
+                if (
+                    (row + col) % 2 === 0
+                ) {
+
+                    ctx.fillRect(
+
+                        player.x +
+                        col * size,
+
+                        player.y +
+                        row * size,
+
+                        size,
+
+                        size
+
+                    );
+
+                }
+
+            }
+
+        }
+
+    }
+
+    else if (
+        skin.pattern === "dots"
+    ) {
+
+        for (
+            let y = player.y + 7;
+            y < player.y + player.height;
+            y += 14
+        ) {
+
+            for (
+                let x = player.x + 7;
+                x < player.x + player.width;
+                x += 14
+            ) {
+
+                ctx.fillRect(
+                    x - 3,
+                    y - 3,
+                    6,
+                    6
+                );
+
+            }
+
+        }
+
+    }
+
+    else if (
+        skin.pattern === "cross"
+    ) {
+
+        ctx.fillRect(
+
+            player.x +
+            13,
+
+            player.y,
+
+            8,
+
+            player.height
+
+        );
+
+        ctx.fillRect(
+
+            player.x,
+
+            player.y +
+            18,
+
+            player.width,
+
+            8
+
+        );
+
+    }
+
+
+    /*
+     * Eyes.
+     */
+
+    ctx.fillStyle =
+        "#FFFFFF";
+
+
+    if (
+        skin.eyes === "wide"
+    ) {
+
+        ctx.fillRect(
+            player.x + 7,
+            player.y + 10,
+            8,
+            8
+        );
+
+        ctx.fillRect(
+            player.x + 21,
+            player.y + 10,
+            8,
+            8
+        );
+
+    }
+
+    else if (
+        skin.eyes === "sleepy"
+    ) {
+
+        ctx.fillRect(
+            player.x + 7,
+            player.y + 12,
+            8,
+            4
+        );
+
+        ctx.fillRect(
+            player.x + 21,
+            player.y + 12,
+            8,
+            4
+        );
+
+    }
+
+    else {
+
+        ctx.fillRect(
+            player.x + 8,
+            player.y + 10,
+            7,
+            7
+        );
+
+        ctx.fillRect(
+            player.x + 21,
+            player.y + 10,
+            7,
+            7
+        );
+
+    }
+
+
+    /*
+     * Pupils.
+     */
+
+    ctx.fillStyle =
+        "#111827";
+
+
+    ctx.fillRect(
+        player.x + 10,
+        player.y + 12,
+        3,
+        3
+    );
+
+    ctx.fillRect(
+        player.x + 23,
+        player.y + 12,
+        3,
+        3
+    );
+
+
+    /*
+     * Accessories.
+     */
+
+    if (
+        skin.accessory === "crown"
+    ) {
+
+        ctx.fillStyle =
+            "#FACC15";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            player.x,
+            player.y
+        );
+
+        ctx.lineTo(
+            player.x + 7,
+            player.y - 14
+        );
+
+        ctx.lineTo(
+            player.x + 16,
+            player.y
+        );
+
+        ctx.lineTo(
+            player.x + 25,
+            player.y - 14
+        );
+
+        ctx.lineTo(
+            player.x + 35,
+            player.y
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+
+    else if (
+        skin.accessory === "antenna"
+    ) {
+
+        ctx.strokeStyle =
+            skin.secondary;
+
+        ctx.lineWidth = 4;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            player.x + 17,
+            player.y
+        );
+
+        ctx.lineTo(
+            player.x + 17,
+            player.y - 16
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillStyle =
+            "#F43F5E";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            player.x + 17,
+            player.y - 18,
+            4,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    else if (
+        skin.accessory === "horns"
+    ) {
+
+        ctx.fillStyle =
+            skin.secondary;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            player.x + 4,
+            player.y + 4
+        );
+
+        ctx.lineTo(
+            player.x - 4,
+            player.y - 10
+        );
+
+        ctx.lineTo(
+            player.x + 12,
+            player.y
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            player.x + 23,
+            player.y
+        );
+
+        ctx.lineTo(
+            player.x + 39,
+            player.y - 10
+        );
+
+        ctx.lineTo(
+            player.x + 31,
+            player.y + 4
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+
+    else if (
+        skin.accessory === "visor"
+    ) {
+
+        ctx.fillStyle =
+            skin.secondary;
+
+        ctx.fillRect(
+
+            player.x + 3,
+
+            player.y + 7,
+
+            player.width - 6,
+
+            13
+
+        );
+
+        ctx.fillStyle =
+            "#111827";
+
+        ctx.fillRect(
+
+            player.x + 7,
+
+            player.y + 10,
+
+            player.width - 14,
+
+            7
+
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   EVENT TIMER
+========================================================= */
+
+setInterval(
+    updateNightEventStatus,
+    1000
+);
+
+
+setInterval(
+    checkEventSkinExpiration,
+    1000
+);
+
+
+updateNightEventStatus();
+
+
+checkEventSkinExpiration();
+
+
+if (
+    activeEventSkin
+) {
+
+    showEventSkin();
+
+}
+
+</script>
+
 
 </body>
 

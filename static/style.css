@@ -340,3 +340,95 @@ button:hover {
 .text-buttons button {
     flex: 1 1 180px;
 }
+
+/* =========================================================
+   NIGHT EVENT SKIN
+========================================================= */
+
+.night-event {
+    margin: 20px auto;
+    padding: 18px;
+    max-width: 900px;
+    border: 2px solid #7c3aed;
+    border-radius: 16px;
+    background: rgba(30, 27, 75, 0.9);
+    text-align: center;
+}
+
+.event-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.event-icon {
+    font-size: 36px;
+}
+
+.night-event h2 {
+    margin: 0;
+}
+
+.night-event p {
+    margin: 5px 0;
+}
+
+#event-timer {
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+.event-reward {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(17, 24, 39, 0.9);
+}
+
+.skin-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+}
+
+.event-skin-preview {
+    position: relative;
+    width: 70px;
+    height: 100px;
+    border-radius: 6px;
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.8);
+}
+
+.event-skin-preview[data-pattern="stripe"] {
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 10px,
+            rgba(255,255,255,0.35) 10px,
+            rgba(255,255,255,0.35) 15px
+        );
+}
+
+.event-skin-preview[data-pattern="checker"] {
+    background-image:
+        linear-gradient(
+            45deg,
+            rgba(255,255,255,0.3) 25%,
+            transparent 25%,
+            transparent 75%,
+            rgba(255,255,255,0.3) 75%
+        );
+    background-size: 18px 18px;
+}
+
+.event-skin-preview[data-pattern="dots"] {
+    background-image:
+        radial-gradient(
+            rgba(255,255,255,0.5) 3px,
+            transparent 4px
+        );
+    background-size: 16px 16px;
+}
